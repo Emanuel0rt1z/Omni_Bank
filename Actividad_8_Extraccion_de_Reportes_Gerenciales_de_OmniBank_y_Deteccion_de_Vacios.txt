@@ -1,33 +1,29 @@
-Actividad 8:
-Extracción de Reportes Gerenciales de OmniBank 
-y Detección de Vacíos
-1. Reporte 1:
-Extracción Quirúrgica de Cuentas Prioritarias
-SELECT
+-- REPORTE 1: Extracción Quirúrgica de Cuentas Prioritarias en OmniBank
+-- Excluye celdas ruidosas (UUIDs, created_at, etc.) mediante proyección explícita
+SELECT 
     account_number,
     account_type,
     balance
-FROM Core.accounts
-WHERE (balance >= 1000.00 
-   OR account_type = 'SAVINGS')
+FROM core.accounts
+WHERE (balance >= 1000.00 OR account_type = 'SAVINGS')
 ORDER BY balance DESC
 LIMIT 2;
-2. Reporte 2:
-Búsqueda Insensible por Patrones en Clientes
-SELECT
+
+-- REPORTE 2: Búsqueda Insensible por Patrones en Clientes Bancarios
+-- Atrapa por igual '@email.com', '@EMAIL.COM' sin alterar el motor
+SELECT 
     first_name,
     last_name,
     email
-FROM Core.Customers
+FROM core.customers
 WHERE email ILIKE '%@email.com';
-3. Reporte 3:
-El Desmantelamiento del Fallo por Nulidad 
-(Lógica Tri-Valuada)
-SELECT
-    COALESCE(
-        description, 
-        'COBRO INSTITUCIONAL O COMISIÓN SIN RECEPTOR'
-    ) AS descripcion_visible
-FROM Core.transactions
-WHERE description IS NULL 
-  AND tx_type = 'WITHDRAWAL';
+
+-- REPORTE 3: Resolución de la Lógica Tri-Valuada y Salvaguarda con COALESCE
+-- Corrige el fallo del analista interino (= NULL -> IS NULL) y purga vacíos
+SELECT 
+    account_id,
+    amount,
+    tx_type,
+    COALESCE(description, 'COBRO INSTITUCIONAL O COMISIÓN - SIN RECEPTOR') AS descripcion_visible
+FROM core.transactions
+WHERE description IS NULL AND tx_type = 'WITHDRAWAL';
