@@ -1,0 +1,8 @@
+Ortiz Canche Jose Emanuel   
+Requerimientos NO funcionales de OmniBank   
+A partir del texto original de la actividad y del mensaje de Slack anterior, extrae los requerimientos No Funcionales (NFRs):   
+Identifica la regla de Consistencia matemática: 
+¿Qué regla sobre el saldo (balance) solicita el CTO para proteger las Cuentas? Que las Cuentas no se queden en números negativos.   
+Identifica la regla de auditoría (Soft Delete): ¿Cómo debe la base de datos manejar la eliminación de clientes si la Cuenta de un cliente debe marcarse como Inactivo?   
+Identifica la regla de rastreo de transacciones (Timestamp): ¿Qué Información temporal es obligatoria en las Cuentas? Cada Vez que sufren un Cambio.
+ Cada Vez que el dinero se mueva de una Cuenta origen a una Cuenta destino, se debe guardar el monto, el tipo de transacción y la Fecha exacta en la que se completó. 
