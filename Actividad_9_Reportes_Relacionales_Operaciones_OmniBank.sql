@@ -1,52 +1,30 @@
--- Actividad 9: Reportes Relacionales para Operaciones de OmniBank
+SELECT (SELECT COUNT(*) FROM core.customers) AS customers,
+       (SELECT COUNT(*) FROM core.accounts) AS accounts,
+       (SELECT COUNT(*) FROM core.transactions) AS movements;
 
--- 1. Punto de Control de la Semilla
-SELECT 'Core.Customers' AS tabla, COUNT(*) AS total_registros
-FROM Core.Customers
-UNION ALL
-SELECT 'Core.accounts' AS tabla, COUNT(*) AS total_registros
-FROM Core.accounts
-UNION ALL
-SELECT 'Core.transactions' AS tabla, COUNT(*) AS total_registros
-FROM Core.transactions;
+SELECT t.transaction_id,c.first_name,c.last_name,a.account_number,t.tx_type,t.amount
+FROM core.transactions t
+JOIN core.accounts a ON a.account_id=t.account_id
+JOIN core.customers c ON c.customer_id=a.customer_id
+ORDER BY t.tx_timestamp,t.transaction_id;
 
--- 2. Recorrido de Cada Movimiento
-SELECT
-    t.transaction_id,
-    c.first_name,
-    c.last_name,
-    a.account_number,
-    t.tx_type,
-    t.amount
-FROM Core.transactions t
-INNER JOIN Core.accounts a 
-    ON t.account_id = a.account_id
-INNER JOIN Core.Customers c 
-    ON a.customer_id = c.customer_id
-ORDER BY t.tx_timestamp ASC, t.transaction_id ASC;
-
--- 3. Cuentas sin Movimiento
-SELECT
-    a.account_number,
-    a.is_active,
-    CASE
-        WHEN a.is_active = true 
-            THEN 'Actividad sin uso registrado'
-        ELSE 'Cuenta desactivada'
-    END AS estado_presentacion
-FROM Core.accounts a
-LEFT JOIN Core.transactions t 
-    ON a.account_id = t.account_id
+SELECT a.account_number,a.is_active,
+       CASE WHEN a.is_active THEN 'ACTIVA SIN MOVIMIENTOS'
+            ELSE 'DESACTIVADA SIN MOVIMIENTOS' END AS estado
+FROM core.accounts a
+LEFT JOIN core.transactions t ON t.account_id=a.account_id
 WHERE t.transaction_id IS NULL
-ORDER BY a.account_number ASC;
+ORDER BY a.account_number;
 
--- 4. Titulares con Cuenta Elegible si Existe
-SELECT
-    c.email,
-    a.account_number,
-    a.balance
-FROM Core.Customers c
-LEFT JOIN Core.accounts a 
-    ON c.customer_id = a.customer_id 
-    AND a.balance > 0
-ORDER BY c.email ASC, a.account_number ASC;
+SELECT c.email,a.account_number,a.balance
+FROM core.customers c
+LEFT JOIN core.accounts a
+  ON a.customer_id=c.customer_id AND a.balance>0
+ORDER BY c.email,a.account_number;
+
+-- Comparación diagnóstica: WHERE elimina las filas externas sin pareja elegible.
+SELECT c.email,a.account_number,a.balance
+FROM core.customers c
+LEFT JOIN core.accounts a ON a.customer_id=c.customer_id
+WHERE a.balance>0
+ORDER BY c.email,a.account_number;
