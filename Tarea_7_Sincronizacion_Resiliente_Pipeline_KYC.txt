@@ -1,0 +1,15 @@
+TAREA 7:
+Sincronización Resiliente del Pipeline KYC 
+con Escrituras Idempotentes (UPSERT)
+El problema del sistema KYC era que el backend 
+utilizaba el patrón:
+  SELECT IF / ELSE + INSERT / UPDATE 
+para comprobar si cada cliente existía. 
+Esto genera mucho tráfico entre la aplicación 
+y PostgreSQL, ya que se realizan varias 
+consultas para cada registro.
+La solución es utilizar un UPSERT mediante:
+  INSERT ON CONFLICT DO UPDATE (o DO NOTHING)
+el cual se encarga directamente de decidir si 
+debe insertar un cliente nuevo o actualizar uno 
+existente, evitando la consulta previa.
