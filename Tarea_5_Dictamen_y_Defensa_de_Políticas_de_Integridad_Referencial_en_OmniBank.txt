@@ -1,0 +1,19 @@
+TAREA 5: Dictamen y DEFENSA de Políticas de Integridad Referencial de OmniBank
+
+
+1. La Catástrofe Empresarial en Producción:
+Se determinó que el uso de ON DELETE CASCADE debe rechazarse en las relaciones 
+críticas del Core Bancario de OmniBank, especialmente cuando involucran Clientes, Cuentas, transacciones. 
+Aunque este comportamiento puede facilitar la limpieza de datos en ambientes de desarrollo o pruebas, en producción representa un riesgo grave.
+ Un DELETE ejecutado por error sobre un cliente podría provocar automáticamente la eliminación de todas sus cuentas y registros relacionados,
+  incluyendo información financiera e histórica que debería conservarse.
+
+2. El Rastro Fiscal y Auditoría Contable Inalienable:
+Los registros de Core.transactions, Core.loans y demás información financiera histórica no deben eliminarse físicamente 
+cuando un cliente cierre su cuenta en OmniBank. Las transacciones representan operaciones que ocurrieron y forman parte del historial
+ contable y de auditoría; eliminarlos impediría reconstruir correctamente las operaciones realizadas y podría entrar en conflicto con obligaciones
+  legales, fiscales, regulatorias y de conservación de registros.
+
+3. El estándar de la Baja Lógica (La Alternativa Correcta):
+El equipo de QA no debe modificar el DDL productivo para facilitar la limpieza mediante ON DELETE CASCADE.
+ La necesidad de eliminar datos de prueba debe resolverse mediante ambientes de desarrollo.
