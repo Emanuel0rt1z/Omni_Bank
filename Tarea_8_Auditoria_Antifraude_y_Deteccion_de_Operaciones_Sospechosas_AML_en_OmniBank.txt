@@ -1,81 +1,11 @@
-TAREA 8:
-Auditoría Antifraude y Detección de 
-Operaciones Sospechosas (AML) en OmniBank
-
-1. El Blindaje por Precedencia Combinatoria 
-de Operadores:
-WHERE 
-(
-    amount >= 10000.00 
-    AND tx_type IN ('TRANSFER', 'WITHDRAWAL')
-)
-OR 
-(
-    description ILIKE '%Crypto%'
-    OR description ILIKE '%offshore%'
-    OR description ILIKE '%shell%'
-    OR description ILIKE '%casino%'
-    OR (
-        description IS NULL 
-        AND tx_type != 'DEPOSIT'
-    )
-)
-
-
-2. El Siguiente Nivel Empresarial: 
-Purga del String Vacío (NULLIF):
-WHERE 
-(
-    amount >= 10000.00 
-    AND tx_type IN ('TRANSFER', 'WITHDRAWAL')
-)
-OR 
-(
-    description ILIKE '%Crypto%'
-    OR description ILIKE '%offshore%'
-    OR description ILIKE '%shell%'
-    OR description ILIKE '%casino%'
-    OR (
-        NULLIF(TRIM(description), '') IS NULL 
-        AND tx_type != 'DEPOSIT'
-    )
-)
--- 3. Presentación Gerencial Limpia (COALESCE + Proyección Quirúrgica):
-SELECT
-    transaction_id,
-    amount,
-    tx_type,
-    tx_timestamp,
-    COALESCE(
-        description, 
-        'EXCLUSIÓN OPORTUNAMENTE DETECTADA - SIN MOTIVO DE PAGO'
-    ) AS descripcion_visible
-FROM Core.transactions
-WHERE 
-(
-    amount >= 10000.00 
-    AND tx_type IN ('TRANSFER', 'WITHDRAWAL')
-)
-OR 
-(
-    description ILIKE '%Crypto%'
-    OR description ILIKE '%offshore%'
-    OR description ILIKE '%shell%'
-    OR description ILIKE '%casino%'
-    OR (
-        NULLIF(TRIM(description), '') IS NULL 
-        AND tx_type != 'DEPOSIT'
-    )
-)
-ORDER BY amount DESC;
-
--- Breve explicación:
--- Estimado director:
--- El envío masivo de falsos positivos ocurrió porque 
--- en SQL el operador AND se ejecuta antes del OR. 
--- Al no usar paréntesis, la consulta evalúa la condición 
--- description IS NULL por su cuenta y sin 
--- importar el tipo de transacción.
-```[cite: 10]
-
----
+SELECT transaction_id,account_id,tx_type,amount,
+       COALESCE(NULLIF(TRIM(description),''),'SIN DESCRIPCIÓN') AS visible_description
+FROM core.transactions
+WHERE (tx_type IN ('TRANSFER','WITHDRAWAL') AND amount>=100)
+   OR (tx_type='WITHDRAWAL' AND NULLIF(TRIM(description),'') IS NULL)
+ORDER BY amount DESC,transaction_id;
+Los dos TRANSFER superan el umbral didáctico. 
+El retiro de 50 entra por descripción faltante. 
+El depósito no cumple ninguno de los dos bloques. 
+Una alerta exploratoria requiere revisión adicional y 
+no constituye una acusación ni un reporte legal.
