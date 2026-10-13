@@ -1,35 +1,8 @@
---Actividad 4: Asignacion de Tipos de Datos Nativos Y Enums en OmniBank
+-- Monedas admitidas
+CREATE TYPE core.tipo_moneda AS ENUM ('USD', 'EUR', 'MXN', 'GBP');
 
---1. Diseña los tipos Enumerados (ENUMS) del banco.
+-- Tipos de cuentas de clientes
+CREATE TYPE core.tipo_cuenta AS ENUM ('CHECKING', 'SAVINGS', 'CREDIT');
 
-CREATE TYPE Tipo_Moneda AS Enum ('PENDIENTE', 'PAGADO', 'EN_TRANSITO', 'CANCELADO')
-CREATE TYPE Tipo_Cuentas AS Enum ('Checking', 'SAVINGS', 'CREDIT')
-CREATE TYPE Tipo_Movimiento AS Enum ('Deposit', 'WITHDRAWAL', 'Transfer')
-
---2. Corrección de tipos Nativos y Especificación Relacional
-
---[ Cuentas ]
--- Cuenta_id (UUID) (PK)
--- Cliente_id
--- tipo_moneda : Tipo_Moneda
--- tipo_cuenta : Tipo_Cuentas
--- saldo_actual : Numeric
--- limite_credito
--- update_at : TIMESTAMP
-
---[ Clientes ]
--- Cliente_id (PK) (UUID)
--- nombre
--- Correo
--- Teléfono
--- Fecha_nacimiento
--- tax_id
--- is_activo
-
--- [ Transacciones ]
--- transaccion_id (PK) (UUID)
--- from_account (UUID) (FK)
--- to_account (UUID) (FK)
--- monto
--- tipo_transaccion
--- fecha_completada
+-- Categorizaciones transaccionales permitidas
+CREATE TYPE core.tipo_transaccion AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER');
