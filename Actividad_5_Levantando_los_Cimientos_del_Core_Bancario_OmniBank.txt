@@ -1,0 +1,59 @@
+-- Actividad 5: Levantamiento los Cimientos del Core Bancario OmniBank (DDL)
+
+-- 1. El espacio modular
+CREATE SCHEMA IF NOT EXISTS Core;
+
+-- 2. Construyendo la Entidad Raiz (Core.Customers)
+CREATE TABLE Core.Customers (
+    cliente_id UUID DEFAULT gen_random_uuid(),
+    nombre_completo VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_nacimiento VARCHAR(50) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    tax_id UUID UNIQUE,
+    CONSTRAINT pk_customers PRIMARY KEY (cliente_id),
+    CONSTRAINT uq_customers_email UNIQUE (email)
+);
+
+-- 3. Construyendo las Entidades Hijas (Core.accounts y Core.loans)
+CREATE TABLE Core.accounts (
+    cuenta_id UUID DEFAULT gen_random_uuid(),
+    cliente_id UUID NOT NULL,
+    tipo_moneda Core.tipo_moneda DEFAULT 'USD' NOT NULL,
+    tipo_cuenta Core.tipo_cuenta DEFAULT 'CHECKING' NOT NULL,
+    saldo_actual NUMERIC (15,2) NOT NULL,
+    update_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT pk_accounts PRIMARY KEY (cuenta_id),
+    CONSTRAINT fk_accounts_customers FOREIGN KEY (cliente_id) REFERENCES Core.Customers(cliente_id) ON DELETE RESTRICT,
+    CONSTRAINT chk_saldo_actual CHECK (saldo_actual >= 0)
+);
+
+CREATE TABLE Core.loans (
+    loan_id UUID DEFAULT gen_random_uuid(),
+    customer_id UUID NOT NULL,
+    loan_number VARCHAR(30) NOT NULL,
+    principal_amount NUMERIC(15,2) NOT NULL,
+    interest_rate NUMERIC(6,4) NOT NULL,
+    status VARCHAR(20) DEFAULT 'ACTIVE' NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT pk_loans PRIMARY KEY (loan_id),
+    CONSTRAINT uq_loans_number UNIQUE (loan_number),
+    CONSTRAINT chk_loans_principal CHECK (principal_amount > 0.00),
+    CONSTRAINT chk_loans_rate CHECK (interest_rate >= 0.00),
+    CONSTRAINT fk_loans_customer FOREIGN KEY (customer_id) 
+        REFERENCES Core.Customers(customer_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE Core.transactions (
+    transaction_id UUID DEFAULT gen_random_uuid(),
+    account_id UUID NOT NULL,
+    tx_type Core.tipo_transaccion NOT NULL,
+    amount NUMERIC(15,2) NOT NULL,
+    tx_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    description VARCHAR(250),
+    CONSTRAINT pk_transactions PRIMARY KEY (transaction_id),
+    CONSTRAINT chk_transactions_amount CHECK (amount > 0.00),
+    CONSTRAINT fk_transactions_account FOREIGN KEY (account_id) 
+        REFERENCES Core.accounts(cuenta_id) ON DELETE RESTRICT
+);
