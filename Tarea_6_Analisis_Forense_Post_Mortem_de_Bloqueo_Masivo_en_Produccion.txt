@@ -1,0 +1,21 @@
+-- Tarea 6: Análisis Forense Post-Mortem de Bloqueo Masivo en Producción
+
+-- 1. La Raíz Computacional (El Bloqueo Exclusivo):
+-- El problema que pasó es porque un ALTER TABLE ADD CONSTRAINT CHECK normal debería 
+-- verificar las filas existentes. Cuando en una tabla con 75 millones de registros, 
+-- esto implicaría un escaneo prolongado; a parte de esto, la operación requiere un 
+-- bloqueo ACCESS EXCLUSIVE que entra en un gran conflicto con todos los demás modos de bloqueo.
+
+-- 2. El Patrón Arquitectónico de Solución en Dos Fases:
+-- Paso 1: Para que no ocurra de nuevo, primero se debe agregar el CHECK como NOT VALID. 
+-- PostgreSQL evita así el escaneo inmediato de los 75 millones de filas.
+
+-- Paso 2: Ejecución de la migración segura en dos fases:
+
+ALTER TABLE Core.transactions
+ADD CONSTRAINT chk_transactions_desc_v
+CHECK (LENGTH (TRIM (description)) > 2)
+NOT VALID;
+
+ALTER TABLE Core.transactions
+VALIDATE CONSTRAINT chk_transactions_desc_v;
