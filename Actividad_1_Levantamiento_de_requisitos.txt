@@ -1,0 +1,21 @@
+Ortiz Canche Jose Emanuel
+
+Actividad 1: Levantamiento de requisitos de Omnibank
+
+A partir del texto anterior, realiza las siguientes tareas en un documento de texto blanco o en tu cuaderno:
+
+1. Identifica las Entidades: Lista los sustantivos principales que representa objetos del mundo real que debemos almacenar (ejemplo: Clientes...)
+
+• Cliente -> Debe almacenar de manera segura
+• Cuentas -> El cliente puede tener varias
+• Transacciones -> Es el corazón del sistema
+
+2. Extrae los Requerimientos funcionales: Escribe al menos 3 requerimientos que dicten qué información exacta debe guardar cada entidad identificada.
+
+• El sistema debe almacenar nombre completo, correo electrónico único, número de teléfono, fecha de nacimiento y su número de Identificación Fiscal (tax ID) del cliente.
+• El sistema debe registrar número de cuenta, la moneda y el tipo de cuenta, el saldo actual y un límite de crédito de las cuentas.
+• El sistema debe registrar cuenta de destino, el monto, el tipo de transacción, y la fecha exacta en la que se completó la transacción.
+
+3. Extrae Restricciones Clave: Identifica qué campo del cliente debe ser matemáticamente único en la base de datos según el texto.
+
+• Su número de Identificación Fiscal (tax ID)
