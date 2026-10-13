@@ -1,0 +1,27 @@
++-----------------------------------+       +-----------------------------------+
+|             Clientes              | 1   N |              Cuentas              |
++-----------------------------------+-------+-----------------------------------+
+| - Cliente_Id (PK) [Aleatorio]     |       | - Cuenta_Id (PK) [Aleatorio]      |
+| - Correo [Debe ser único]         |       | - Cliente_Id (FK)                 |
+| - telefono                        |       | - moneda                          |
+| - Fecha_nacimiento                |       | - Tipo_Cuenta                     |
+| - tax_id [Debe ser único]         |       | - saldo_actual [No debe ser neg.] |
+| - Estado                          |       | - limite_credito                  |
++-----------------------------------+       | - Fecha_tiempo                    |
+                                            +-----------------------------------+
+                                                             |
+                                                             | 1
+                                                             |
+                                                             | M
+                                            +-----------------------------------+
+                                            |           Transacciones           |
+                                            +-----------------------------------+
+                                            | - transaccion_Id (PK) [Aleatorio] |
+                                            | - Monto                           |
+                                            | - tipo_transaccion                |
+                                            +-----------------------------------+
+
+---------------------------------------------------------------------------------
+RELACIÓN ESPECIAL (Autoreferencia en Cuentas):
+[Cuentas] (Cuenta origen)  <=================>  [Cuentas] (Cuenta destino)
+---------------------------------------------------------------------------------
