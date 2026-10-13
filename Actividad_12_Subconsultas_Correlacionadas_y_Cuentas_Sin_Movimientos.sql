@@ -1,35 +1,20 @@
--- Actividad 12: Subconsultas Correlacionadas y Cuentas sin Movimientos
--- Conserva la base acumulada hasta el día anterior y ejecuta este archivo antes de la tarea.
--- Cada bloque debe poder contrastarse con los datos de partida indicados.
-
--- 1 y 2. Calcula para cada movimiento el promedio de amount y filtra aquellos que superen su promedio de cuenta
-SELECT
-    t.transaction_id,
-    t.account_id,
-    t.amount,
-    (
-        SELECT ROUND(AVG(sub.amount), 2)
-        FROM Core.transactions sub
-        WHERE sub.account_id = t.account_id
-    ) AS promedio_cuenta
-FROM Core.transactions t
-WHERE t.amount > (
-    SELECT AVG(sub.amount)
-    FROM Core.transactions sub
-    WHERE sub.account_id = t.account_id
+SELECT t_ext.transaction_id,t_ext.account_id,t_ext.amount,
+       (SELECT ROUND(AVG(t_int.amount),2)
+        FROM core.transactions t_int
+        WHERE t_int.account_id=t_ext.account_id) AS account_average
+FROM core.transactions t_ext
+WHERE t_ext.amount>(
+  SELECT AVG(t_int.amount)
+  FROM core.transactions t_int
+  WHERE t_int.account_id=t_ext.account_id
 )
-ORDER BY t.transaction_id ASC;
+ORDER BY t_ext.amount DESC;
+SELECT account_id,ROUND(AVG(amount),2) AS account_average
+FROM core.transactions GROUP BY account_id ORDER BY account_id;
 
--- 3 y 4. Desde accounts, utiliza NOT EXISTS para hallar cuentas sin movimientos y explica el comportamiento
-SELECT
-    a.account_id,
-    a.account_number,
-    a.account_type,
-    a.is_active
-FROM Core.accounts a
+SELECT a.account_number,a.is_active,a.balance
+FROM core.accounts a
 WHERE NOT EXISTS (
-    SELECT 1
-    FROM Core.transactions t
-    WHERE t.account_id = a.account_id
+  SELECT 1 FROM core.transactions t WHERE t.account_id=a.account_id
 )
-ORDER BY a.account_id ASC;
+ORDER BY a.account_number;
