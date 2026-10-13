@@ -1,27 +1,17 @@
-+-----------------------------------+       +-----------------------------------+
-|             Clientes              | 1   N |              Cuentas              |
-+-----------------------------------+-------+-----------------------------------+
-| - Cliente_Id (PK) [Aleatorio]     |       | - Cuenta_Id (PK) [Aleatorio]      |
-| - Correo [Debe ser único]         |       | - Cliente_Id (FK)                 |
-| - telefono                        |       | - moneda                          |
-| - Fecha_nacimiento                |       | - Tipo_Cuenta                     |
-| - tax_id [Debe ser único]         |       | - saldo_actual [No debe ser neg.] |
-| - Estado                          |       | - limite_credito                  |
-+-----------------------------------+       | - Fecha_tiempo                    |
-                                            +-----------------------------------+
-                                                             |
-                                                             | 1
-                                                             |
-                                                             | M
-                                            +-----------------------------------+
-                                            |           Transacciones           |
-                                            +-----------------------------------+
-                                            | - transaccion_Id (PK) [Aleatorio] |
-                                            | - Monto                           |
-                                            | - tipo_transaccion                |
-                                            +-----------------------------------+
+[Clientes] 1 ------------ N [Cuentas]
+- cliente_id (PK, UUID)       - cuenta_id (PK, UUID)
+- nombre                      - cliente_id (FK, UUID)
+- correo                      - moneda
+- telefono                    - tipo_cuenta
+- fecha_nacimiento            - saldo_actual (CHECK: >= 0)
+- tax_id (UNIQUE)             - limite_credito
+- is_active (Soft Delete)     - updated_at (Timestamp NFR)
 
----------------------------------------------------------------------------------
-RELACIÓN ESPECIAL (Autoreferencia en Cuentas):
-[Cuentas] (Cuenta origen)  <=================>  [Cuentas] (Cuenta destino)
----------------------------------------------------------------------------------
+                   (Cuenta Origen)
+[Cuentas] 1 ------------------------- N [Transacciones]
+                                          - transaccion_id (PK, UUID)
+                   (Cuenta Destino)       - from_account (FK, UUID -> Cuentas)
+[Cuentas] 1 ------------------------- N   - to_account (FK, UUID -> Cuentas)
+                                          - monto
+                                          - tipo_transaccion
+                                          - fecha_completada
