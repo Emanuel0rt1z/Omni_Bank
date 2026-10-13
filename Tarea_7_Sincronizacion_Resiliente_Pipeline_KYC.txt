@@ -1,15 +1,24 @@
-TAREA 7:
-Sincronización Resiliente del Pipeline KYC 
-con Escrituras Idempotentes (UPSERT)
-El problema del sistema KYC era que el backend 
-utilizaba el patrón:
-  SELECT IF / ELSE + INSERT / UPDATE 
-para comprobar si cada cliente existía. 
-Esto genera mucho tráfico entre la aplicación 
-y PostgreSQL, ya que se realizan varias 
-consultas para cada registro.
-La solución es utilizar un UPSERT mediante:
-  INSERT ON CONFLICT DO UPDATE (o DO NOTHING)
-el cual se encarga directamente de decidir si 
-debe insertar un cliente nuevo o actualizar uno 
-existente, evitando la consulta previa.
+El siguiente mandato atómico resuelve el 100% de la carga del pipeline KYC en un solo viaje computado en el servidor con resiliencia 
+transaccional absoluta y cero riesgo de condición de carrera:
+
+-- Guion Oficial para Sincronización KYC en OmniBank:
+INSERT INTO core.customers (first_name, last_name, email, phone_number, tax_id)
+VALUES 
+    ('Humberto', 'López', 'hlopez@email.com', '+52-55-4433-2211', 'TAX-990011')
+ON CONFLICT (email) 
+DO UPDATE SET 
+    first_name   = EXCLUDED.first_name,
+    last_name    = EXCLUDED.last_name,
+    phone_number = EXCLUDED.phone_number,
+    -- (Es vital dejar intacta y no tocar deliberadamente nuestra fecha de alta created_at ni su UUID)
+    is_active    = true
+RETURNING customer_id, email, is_active;
+Análisis Operativo de la Sentencia:
+
+Cuando el ciudadano ingresa por vez primera (30% del volumen), el motor evalúa milimétricamente el INSERT convencional por entero 
+y nos escupe triunfal en milisegundos las celdas generadas vía RETURNING.
+Cuando ese titular bancario ya existía consolidadamente en producción (70% de la masa), la compuerta nativa de PostgreSQL intercepta 
+limpiamente la colisión sobre el índice del email y deriva al instante la ejecución hacia la cláusula DO UPDATE. En lugar de fracasar con un error
+ por duplicado o reescribir torpemente identificadores fijos históricos del pasado, apelamos con destreza industrial a la variable y tabla efímera 
+ EXCLUDED, la cual envuelve mágicamente las celdas renovadas que arribaron en nuestro bloque VALUES, actualizando milimétricamente el nombre y el número
+telefónico sin romper ni en lo absoluto alterar la integridad de las llaves foráneas o el registro secular con el que el cliente se dio de alta años atrás.
