@@ -1,0 +1,51 @@
+Actividad 3: Normalizando el prototipo Monolítico OmniBank
+
+1. Paso 1 - Primera Forma Normal (1NF)
+
++------------------+----------+----------------+----------------+---------------------+---------------+--------+---------+--------------+----------+-----------------+-------------------+
+| Transacciones_id | Fecha_tx | Cliente_tax_id | Cliente_nombre | Contacto            | Cuenta_numero | Moneda | Tipo    | Saldo_actual | Monto_tx | Sucursal_codigo | Sucursal_direccion|
++------------------+----------+----------------+----------------+---------------------+---------------+--------+---------+--------------+----------+-----------------+-------------------+
+| tx-0001          | 2026-07-10| TAX-9911      | Roberto Soto   | Rob@mail.com        | CTA-100       | USD    | Checking| 1500.00      | +500.00  | S-CDMX          | AV. Juarez #100   |
+|                  |          |                |                | 555-9011            |               |        |         |              |          |                 |                   |
++------------------+----------+----------------+----------------+---------------------+---------------+--------+---------+--------------+----------+-----------------+-------------------+
+| tx-0002          | 2026-07-21| TAX-9911      | Roberto Soto   | Rob@mail.com        | CTA-100       | USD    | Checking| 1300.00      | -200.00  | S-CDMX          | AV. Juarez #100   |
+|                  |          |                |                | 555-9011            |               |        |         |              |          |                 |                   |
++------------------+----------+----------------+----------------+---------------------+---------------+--------+---------+--------------+----------+-----------------+-------------------+
+
+2. Paso 2 - Segunda y tercera Forma Normal (2NF y 3NF)
+
+¿Por qué la información como Cliente-tax-id, Cliente-nombre y Sucursal-direccion viola la 2NF y 3NF si la llave primaria es Transaccion-id?
+
+Respuesta:
+Porque son 3 diferentes entidades y no comparten la misma dirección.
+
+4. Tablas 3NF (Estructura final de tablas)
+
+Clientes (3NF)
+--------------
+- Cliente_id (PK)
+- Cliente_nombre
+- Email
+- Telefono
+- Cliente_tax_id
+
+Cuentas (3NF)
+-------------
+- Cuenta_numero (PK)
+- Saldo_actual
+- Fecha_tx (FK)
+
+Transacciones (3NF)
+-------------------
+- Transaccion_id (PK)
+- Fecha_tx
+- Moneda
+- Tipo
+- Monto_tx
+- Cuenta_numero (FK)
+
+Sucursales (3NF)
+----------------
+- Sucursal_codigo (PK)
+- Sucursal_direccion
+- Transaccion_id (FK)
